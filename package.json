@@ -1,0 +1,25 @@
+{
+    "name": "skarya-mcp-server",
+    "version": "1.0.0",
+    "description": "Skarya.ai Model Context Protocol Server",
+    "main": "src/index.js",
+    "type": "module",
+    "scripts": {
+        "start": "node src/index.js",
+        "dev": "node --watch src/index.js",
+        "auth": "node src/scripts/setup-auth.js",
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "dependencies": {
+        "@modelcontextprotocol/sdk": "^1.0.1",
+        "dotenv": "^16.6.1",
+        "node-fetch": "^3.3.2",
+        "prompt-sync": "^4.2.0"
+    },
+    "devDependencies": {
+        "eslint": "^8.56.0"
+    },
+    "engines": {
+        "node": ">=18.0.0"
+    }
+}
