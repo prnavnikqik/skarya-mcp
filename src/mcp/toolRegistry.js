@@ -5,7 +5,8 @@ toolRegistry.registerTool('bugFinder', require('./tools/bugFinder'));
 toolRegistry.registerTool('testGenerator', require('./tools/testGenerator'));
 module.exports = toolRegistry;
 */
-import { registerBoardTools } from "../tools/boards/board.tools.js";
+import { registerBoardTools } from "../boards/boards.tools.js";
+import { registerTaskTools } from "../tasks/tasks.tools.js";
 import { requireAuth } from "../middleware/requireAuth.js";
 
 export function registerTools(server) {
@@ -14,4 +15,5 @@ export function registerTools(server) {
 
   // Domain-specific tools
   registerBoardTools(server);
+  registerTaskTools(server);
 }
