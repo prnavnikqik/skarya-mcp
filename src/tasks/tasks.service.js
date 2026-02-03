@@ -14,13 +14,21 @@ export class TaskService {
         if (!ctx.accessToken) {
             throw new Error("Unauthorized: Missing access token in context");
         }
-        return {
+
+        const headers = {
             "Content-Type": "application/json",
-            "Authorization": `Bearer ${ctx.accessToken}`,
             "x-user-email": ctx.email,
             "x-workspace-id": ctx.workspaceId,
             "x-subdomain": ctx.subdomain
         };
+
+        if (!ctx.isCookie && !ctx.accessToken.includes("=")) {
+            headers["Authorization"] = `Bearer ${ctx.accessToken}`;
+        } else {
+            headers["Cookie"] = ctx.accessToken;
+        }
+
+        return headers;
     }
 
     async _request(endpoint, method, body, ctx) {
@@ -62,7 +70,7 @@ export class TaskService {
 
         if (result.success && Array.isArray(result.data)) {
             // Filter to only include items that look like tasks (just in case)
-            return result.data
+            const tasks = result.data
                 .filter(item => item.type === 'Task') // capture showed "type": "Task"
                 .map(t => ({
                     id: t._id,
@@ -73,8 +81,20 @@ export class TaskService {
                     dueDate: t.dueDate,
                     taskNumber: t.taskNumber
                 }));
+
+            return {
+                content: [{
+                    type: "text",
+                    text: JSON.stringify(tasks, null, 2)
+                }]
+            };
         }
-        return [];
+        return {
+            content: [{
+                type: "text",
+                text: "[]"
+            }]
+        };
     }
 
     /**
@@ -98,9 +118,14 @@ export class TaskService {
 
         const result = await this._request("/api/tasks/createTask", "POST", payload, ctx);
         return {
-            id: result.data?._id,
-            message: "Task created successfully",
-            taskNumber: result.data?.taskNumber
+            content: [{
+                type: "text",
+                text: JSON.stringify({
+                    id: result.data?._id,
+                    message: "Task created successfully",
+                    taskNumber: result.data?.taskNumber
+                }, null, 2)
+            }]
         };
     }
 
@@ -126,7 +151,15 @@ export class TaskService {
         Object.keys(payload).forEach(key => payload[key] === undefined && delete payload[key]);
 
         await this._request("/api/tasks/updateTask", "PUT", payload, ctx);
-        return { message: "Task updated successfully", taskId: params.taskId };
+        return {
+            content: [{
+                type: "text",
+                text: JSON.stringify({
+                    message: "Task updated successfully",
+                    taskId: params.taskId
+                }, null, 2)
+            }]
+        };
     }
 }
 
